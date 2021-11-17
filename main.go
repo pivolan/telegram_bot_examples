@@ -68,10 +68,25 @@ func main() {
 					data := tgbotapi.FileBytes{Name: "filename.txt", Bytes: []byte("empty file")}
 					msg := tgbotapi.NewDocumentUpload(message.Chat.ID, data)
 					msg.Caption = "caption"
-					bot.Send(msg)
+					r, _ := bot.Send(msg)
+					botMessageId = r.MessageID
 					return
 				case "edit": //edit bot message
 					msg := tgbotapi.NewEditMessageText(update.Message.Chat.ID, botMessageId, fmt.Sprintf("message changed"))
+					msg.ParseMode = tgbotapi.ModeMarkdown
+					bot.Send(msg)
+					return
+				case "edit_file": //edit bot message
+					msg := tgbotapi.NewEditMessageCaption(update.Message.Chat.ID, botMessageId, fmt.Sprintf("caption changed"))
+					bot.Send(msg)
+					return
+				case "edit_keyboard": //edit bot message
+					msg := tgbotapi.NewEditMessageCaption(update.Message.Chat.ID, botMessageId, fmt.Sprintf("kb changed"))
+					msg.ReplyMarkup = InlineEditKeyboard()
+					bot.Send(msg)
+					return
+				case "delete": //edit bot message
+					msg := tgbotapi.NewEditMessageText(update.Message.Chat.ID, botMessageId, fmt.Sprintf(""))
 					msg.ParseMode = tgbotapi.ModeMarkdown
 					bot.Send(msg)
 					return
@@ -118,6 +133,17 @@ func InlineKeyboard() tgbotapi.InlineKeyboardMarkup {
 	kb := tgbotapi.NewInlineKeyboardMarkup(keyboardButtons)
 
 	return kb
+}
+func InlineEditKeyboard() *tgbotapi.InlineKeyboardMarkup {
+	buttons := map[string]string{"changed": "/changed"}
+
+	keyboardButtons := []tgbotapi.InlineKeyboardButton{}
+	for buttonName, buttonValue := range buttons {
+		keyboardButtons = append(keyboardButtons, tgbotapi.NewInlineKeyboardButtonData(buttonName, buttonValue))
+	}
+	kb := tgbotapi.NewInlineKeyboardMarkup(keyboardButtons)
+
+	return &kb
 }
 func DefaultKeyboard() tgbotapi.ReplyKeyboardMarkup {
 	rows := [][]tgbotapi.KeyboardButton{}
