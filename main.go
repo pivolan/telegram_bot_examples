@@ -133,7 +133,13 @@ func main() {
 }
 
 func InlineKeyboard() tgbotapi.InlineKeyboardMarkup {
-	buttons := map[string]string{"\xF0\x9F\x98\x81 some text": "/some_route", "12": "some text"}
+	buttons := map[string]string{
+		"\xF0\x9F\x98\x81 some text": "/some_route",
+		"12":                         "some text",
+		"13":                         "some text",
+		"14":                         "some text",
+		"15":                         "some text",
+	}
 
 	keyboardButtons := []tgbotapi.InlineKeyboardButton{}
 	for buttonName, buttonValue := range buttons {
