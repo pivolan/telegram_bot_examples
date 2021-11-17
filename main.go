@@ -64,6 +64,12 @@ func main() {
 					msg.ParseMode = tgbotapi.ModeMarkdown
 					bot.Send(msg)
 					return
+				case "file": //edit bot message
+					data := tgbotapi.FileBytes{Name: "filename.txt", Bytes: []byte("empty file")}
+					msg := tgbotapi.NewDocumentUpload(message.Chat.ID, data)
+					msg.Caption = "caption"
+					bot.Send(msg)
+					return
 				case "edit": //edit bot message
 					msg := tgbotapi.NewEditMessageText(update.Message.Chat.ID, botMessageId, fmt.Sprintf("message changed"))
 					msg.ParseMode = tgbotapi.ModeMarkdown
@@ -75,10 +81,12 @@ func main() {
 					_, err := bot.Send(msg)
 					if err != nil {
 						fmt.Println(err)
+						msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("error edit message: %s", err))
+						bot.Send(msg)
 					}
 					return
 				default:
-					commands := []string{"/k", "/khide", "/buttons", "/markdown", "/edit", "/edit_self"}
+					commands := []string{"/k", "/khide", "/buttons", "/markdown", "/edit", "/edit_self", "/file"}
 					msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("command getted: %s\n commands allowed:\n%s", update.Message.Command(), strings.Join(commands, "\n")))
 					bot.Send(msg)
 				}
