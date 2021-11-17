@@ -53,11 +53,12 @@ func main() {
 					msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 					bot.Send(msg)
 					return
-				case "buttons": //show buttons inline keyboard
+				case "inline": //show buttons inline keyboard
 					kb := InlineKeyboard()
 					msg := tgbotapi.NewMessage(update.Message.Chat.ID, "inline keyboard")
 					msg.ReplyMarkup = kb
-					bot.Send(msg)
+					r, _ := bot.Send(msg)
+					botMessageId = r.MessageID
 					return
 				case "markdown": //markdown message smiles
 					msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("*Нажмите* **curs** _italy_\n\n# header\n\n 🙂 some text \xF0\x9F\x98\x81 some text"))
@@ -81,14 +82,22 @@ func main() {
 					bot.Send(msg)
 					return
 				case "edit_keyboard": //edit bot message
-					msg := tgbotapi.NewEditMessageCaption(update.Message.Chat.ID, botMessageId, fmt.Sprintf("kb changed"))
+					msg := tgbotapi.NewEditMessageText(update.Message.Chat.ID, botMessageId, fmt.Sprintf("kb changed"))
 					msg.ReplyMarkup = InlineEditKeyboard()
-					bot.Send(msg)
+					_, err = bot.Send(msg)
+					if err != nil {
+						log.Println("error on edit kb message:", err)
+					}
 					return
 				case "delete": //edit bot message
-					msg := tgbotapi.NewEditMessageText(update.Message.Chat.ID, botMessageId, fmt.Sprintf(""))
-					msg.ParseMode = tgbotapi.ModeMarkdown
-					bot.Send(msg)
+					msg := tgbotapi.DeleteMessageConfig{
+						ChatID:    message.Chat.ID,
+						MessageID: botMessageId,
+					}
+					_, err = bot.DeleteMessage(msg)
+					if err != nil {
+						log.Println("error on delete message:", err)
+					}
 					return
 				case "edit_self": //user message cannot be edited
 					msg := tgbotapi.NewEditMessageText(update.Message.Chat.ID, userMessageId, fmt.Sprintf("your message changed"))
@@ -101,7 +110,7 @@ func main() {
 					}
 					return
 				default:
-					commands := []string{"/k", "/khide", "/buttons", "/markdown", "/edit", "/edit_self", "/file"}
+					commands := []string{"/k", "/khide", "/inline", "/markdown", "/edit", "/delete", "/edit_file", "/edit_self", "/file", "/edit_keyboard"}
 					msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("command getted: %s\n commands allowed:\n%s", update.Message.Command(), strings.Join(commands, "\n")))
 					bot.Send(msg)
 				}
