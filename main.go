@@ -4,10 +4,11 @@ import (
 	"fmt"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 	"log"
+	"os"
 	"strings"
 )
 
-const TELEGRAM_BOT_API = "2124047747:AAFjAHlV37rFCbjqZ9c6CmqtCREUTYOydQE"
+const TELEGRAM_BOT_API = "6232707025:AAECU6gOFwNwug-I7tjrWPq9ML6kOFBiru8"
 
 var botMessageId int
 var userMessageId int
@@ -72,6 +73,14 @@ func main() {
 					r, _ := bot.Send(msg)
 					botMessageId = r.MessageID
 					return
+				case "photo": //edit bot message
+					body, _ := os.ReadFile("1.jpg")
+					data := tgbotapi.FileBytes{Name: "filename.jpg", Bytes: body}
+					msg := tgbotapi.NewPhotoUpload(message.Chat.ID, data)
+					msg.Caption = "caption"
+					r, _ := bot.Send(msg)
+					botMessageId = r.MessageID
+					return
 				case "edit": //edit bot message
 					msg := tgbotapi.NewEditMessageText(update.Message.Chat.ID, botMessageId, fmt.Sprintf("message changed"))
 					msg.ParseMode = tgbotapi.ModeMarkdown
@@ -110,7 +119,7 @@ func main() {
 					}
 					return
 				default:
-					commands := []string{"/k", "/khide", "/inline", "/markdown", "/edit", "/delete", "/edit_file", "/edit_self", "/file", "/edit_keyboard"}
+					commands := []string{"/k", "/khide", "/inline", "/markdown", "/edit", "/delete", "/edit_file", "/edit_self", "/file", "/edit_keyboard", "/photo"}
 					msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("command getted: %s\n commands allowed:\n%s", update.Message.Command(), strings.Join(commands, "\n")))
 					bot.Send(msg)
 				}
