@@ -37,7 +37,7 @@ func main() {
 
 			message := update.Message
 
-			if message.IsCommand() {
+			if message != nil && message.IsCommand() {
 				args := strings.TrimSpace(update.Message.CommandArguments())
 				parts := strings.Split(args, " ")
 				if len(parts) == 1 && parts[0] == "" {
@@ -78,6 +78,15 @@ func main() {
 					data := tgbotapi.FileBytes{Name: "filename.jpg", Bytes: body}
 					msg := tgbotapi.NewPhotoUpload(message.Chat.ID, data)
 					msg.Caption = "caption"
+					r, _ := bot.Send(msg)
+					botMessageId = r.MessageID
+					return
+				case "photo_channel": //edit bot message
+					body, _ := os.ReadFile("1.jpg")
+					data := tgbotapi.FileBytes{Name: "filename.jpg", Bytes: body}
+					msg := tgbotapi.NewPhotoUpload(message.Chat.ID, data)
+					msg.Caption = "caption"
+					msg.BaseFile.BaseChat.ChannelUsername = "@testing_bots_ads"
 					r, _ := bot.Send(msg)
 					botMessageId = r.MessageID
 					return
